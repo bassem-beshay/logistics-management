@@ -1,0 +1,1 @@
+recursive-include logistics_management *.json *.py *.txt

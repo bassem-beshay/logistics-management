@@ -1,0 +1,19 @@
+{
+ "doctype":"DocType", "name":"Delivery Run", "module":"Logistics", "autoname":"format:RUN-{#####}",
+ "field_order":["driver","run_status","total_cash_collected","started_date","completed_date","cash_banked_date","cash_banked_location","delivery_stops"],
+ "fields":[
+  {"fieldname":"driver","label":"Driver","fieldtype":"Link","options":"Driver","reqd":1,"read_only":1,"in_list_view":1},
+  {"fieldname":"run_status","label":"Run Status","fieldtype":"Select","options":"Draft\nAssigned\nEn Route\nCompleted\nCash Banked\nCancelled","default":"Draft","read_only":1,"in_list_view":1},
+  {"fieldname":"total_cash_collected","label":"Total Cash Collected","fieldtype":"Currency","default":"0","read_only":1,"in_list_view":1},
+  {"fieldname":"started_date","label":"Started Date","fieldtype":"Datetime","read_only":1},
+  {"fieldname":"completed_date","label":"Completed Date","fieldtype":"Datetime","read_only":1},
+  {"fieldname":"cash_banked_date","label":"Cash Banked Date","fieldtype":"Datetime","read_only":1},
+  {"fieldname":"cash_banked_location","label":"Cash Banked Location","fieldtype":"Data","read_only":1},
+  {"fieldname":"delivery_stops","label":"Delivery Stops","fieldtype":"Table","options":"Delivery Stop","read_only":1}
+ ],
+ "permissions":[
+  {"role":"Logistics Manager","read":1,"write":1,"create":1,"delete":1,"report":1,"export":1},
+  {"role":"Logistics Dispatcher","read":1,"report":1},
+  {"role":"Logistics Driver","read":1}
+ ]
+}
