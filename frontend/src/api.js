@@ -1,8 +1,16 @@
 const base = import.meta.env.VITE_FRAPPE_URL || ''
 let csrfToken = window.frappe?.csrf_token || ''
 
+export class RequestError extends Error {
+  constructor(message, status = 0) {
+    super(message)
+    this.name = 'RequestError'
+    this.status = status
+  }
+}
+
 function messageFrom(payload, fallback) {
-  if (!payload?._server_messages) return payload?.message || fallback
+  if (!payload?._server_messages) return payload?.message || payload?.exception || fallback
   try {
     return JSON.parse(payload._server_messages)
       .map(item => {
@@ -21,7 +29,7 @@ async function request(path, options = {}) {
   const requestMethod = (requestOptions.method || 'GET').toUpperCase()
   const unsafe = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(requestMethod)
   if (unsafe && !csrfToken) {
-    throw new Error('The session security token is unavailable. Refresh the page and sign in again.')
+    throw new RequestError('The session security token is unavailable. Refresh the page and sign in again.', 403)
   }
 
   const headers = { Accept: 'application/json', ...suppliedHeaders }
@@ -33,7 +41,7 @@ async function request(path, options = {}) {
   })
   const payload = await response.json().catch(() => ({}))
   if (!response.ok || payload.exc) {
-    throw new Error(messageFrom(payload, `Request failed (${response.status})`))
+    throw new RequestError(messageFrom(payload, `Request failed (${response.status})`), response.status)
   }
   return payload.message ?? payload.data
 }
@@ -44,10 +52,14 @@ export async function method(name, args = {}) {
     if (name === 'me' && data?.csrf_token) csrfToken = data.csrf_token
     return data
   }
+  const form = new URLSearchParams()
+  Object.entries(args).forEach(([key, value]) => {
+    form.set(key, typeof value === 'string' ? value : JSON.stringify(value))
+  })
   return request(`/api/method/logistics_management.api.${name}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(args),
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+    body: form,
   })
 }
 
