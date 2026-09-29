@@ -1,6 +1,7 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
+from frappe.utils import cint
 
 from logistics_management.exceptions import LogisticsValidationError
 
@@ -9,7 +10,7 @@ class Driver(Document):
     def validate(self):
         if not self.phone_number:
             frappe.throw(_("Phone Number is required."), LogisticsValidationError)
-        if (self.max_stops_per_run or 0) <= 0:
+        if cint(self.max_stops_per_run) <= 0:
             frappe.throw(_("Max Stops Per Run must be greater than zero."), LogisticsValidationError)
 
         previous = self.get_doc_before_save()

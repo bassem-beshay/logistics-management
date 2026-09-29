@@ -1,6 +1,7 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
+from frappe.utils import flt
 
 from logistics_management.exceptions import LogisticsValidationError
 
@@ -13,7 +14,9 @@ class DeliveryOrder(Document):
     def validate(self):
         if not self.customer_name or not self.address:
             frappe.throw(_("Customer Name and Address are required."), LogisticsValidationError)
-        if (self.cash_amount or 0) < 0:
+        # REST payloads can still contain numeric strings while validation is
+        # running, so normalize before comparing with a number.
+        if flt(self.cash_amount) < 0:
             frappe.throw(_("Cash Amount cannot be negative."), LogisticsValidationError)
 
         previous = self.get_doc_before_save()

@@ -185,3 +185,17 @@ class TestLogisticsWorkflow(FrappeTestCase):
                     "cash_amount": -1,
                 }
             ).insert()
+
+    def test_order_validation_accepts_numeric_string_from_rest_payload(self):
+        frappe.set_user(self.dispatcher)
+        order = frappe.get_doc(
+            {
+                "doctype": "Delivery Order",
+                "customer_name": "REST Customer",
+                "address": "Cairo",
+                "cash_amount": "100",
+                "priority": "Medium",
+            }
+        ).insert()
+
+        self.assertEqual(order.cash_amount, 100)

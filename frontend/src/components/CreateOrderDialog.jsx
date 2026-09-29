@@ -23,7 +23,10 @@ export default function CreateOrderDialog({ open, busy, audience = 'admin', onCl
 
   const submit = async event => {
     event.preventDefault()
-    const result = await onSubmit(form)
+    const result = await onSubmit({
+      ...form,
+      cash_amount: Number(form.cash_amount),
+    })
     if (result !== false) onClose()
   }
 
